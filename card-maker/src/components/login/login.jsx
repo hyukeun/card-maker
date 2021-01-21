@@ -1,16 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import Footer from '../footer/footer';
 import Header from '../header/header';
 import styles from './login.module.css';
-// login 이라는 function을 만들어 줄 것이다. 
 
-const Login = ({authService}) => {
+const Login = ({ authService }) => {
+  const history = useHistory();
+  const goToMaker = userId => {
+    history.push({
+      pathname: '/maker',
+      state: {id: userId},
+    });
+  }
 
     const onLogin = event => {
         authService
         .login(event.currentTarget.textContent)
-        .then(console.log); // authService라는 것을 이용할것인데 우리가 provider에 있는 것을 전달해 줘야한다.
+        .then(data => goToMaker(data.user.uid));
     };
+
+    useEffect(() => {
+      authService.onAuthChange(user => {
+        user && goToMaker(user.uid);
+      });
+    }); 
+    // user.uid라는 것을 만들어 주었고 callback함수를 이용해서 작성해 주었다. 
 
     // 그래서 이름은 우리가 버튼에 들어있는 텍스트들을 이용해 주면 된다 .
 
@@ -36,6 +50,5 @@ const Login = ({authService}) => {
         </section>
       );
     };
-    
 
 export default Login;
